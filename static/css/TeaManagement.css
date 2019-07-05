@@ -60,15 +60,15 @@
     padding-left: 20px;
 }
 
-    #mainfunction:hover {
-        text-decoration: none;
-        font-family: KaiTi;
-        font-size: 20px;
-        color: #322f2f;
-        font-weight: bold;
-        background-color: #b6b2b2;
-        height: 50px;
-    }
+#mainfunction:hover {
+    text-decoration: none;
+    font-family: KaiTi;
+    font-size: 20px;
+    color: #322f2f;
+    font-weight: bold;
+    background-color: #b6b2b2;
+    height: 50px;
+}
 .operationintroduction {
     width: 100%;
     height: 80%;
@@ -155,20 +155,20 @@
     outline: none;
 }
 
-    #submit:hover {
-        width: 15%;
-        height: 14.3%;
-        margin-top: 5%;
-        margin-left: 42.5%;
-        font-weight: 500;
-        background-color: #357ebd;
-        cursor: pointer;
-        border-radius: 5px;
-        border: 1px solid #357ebd;
-        color: white;
-        font-size: large;
-        outline: none;
-    }
+#submit:hover {
+    width: 15%;
+    height: 14.3%;
+    margin-top: 5%;
+    margin-left: 42.5%;
+    font-weight: 500;
+    background-color: #357ebd;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color: white;
+    font-size: large;
+    outline: none;
+}
 
 #fourfunction {
     height: 20%;
@@ -181,7 +181,7 @@
     float: left;
 }
 
-#button {
+.button {
     width: 20%;
     height: 57.14%;
     margin-left: 4%;
@@ -194,20 +194,22 @@
     outline: none;
 }
 
-    #button:hover {
-        width: 20%;
-        height: 57.14%;
-        margin-left: 4%;
-        font-weight: 500;
-        background-color: #357ebd;
-        cursor: pointer;
-        border-radius: 5px;
-        border: 1px solid #357ebd;
-        color: white;
-        font-size: large;
-        outline: none;
-    }
-
+.button:hover {
+    width: 20%;
+    height: 57.14%;
+    margin-left: 4%;
+    font-weight: 500;
+    background-color: #357ebd;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color: white;
+    font-size: large;
+    outline: none;
+}
+.button:focus {
+    background-color: #03a9f4
+}
 .hide {
     display: none;
 }

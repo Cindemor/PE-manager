@@ -15,7 +15,13 @@ POOL = PooledDB(
     charset = "utf8"
 )
 
-class stu_data():
+class m_data():
+    def __init__(self, list):
+        self.__list = list
+    def get_list(self):
+        return self.__list
+
+class stu_data(m_data):
     def __init__(self, sno, sname, term, cname, grade, list):
         self.__sno = sno
         self.__sname = sname
@@ -36,18 +42,6 @@ class stu_data():
     def get_list(self):
         return self.__list
 
-class sm_data():
-    def __init__(self, list):
-        self.__list = list
-    def get_list(self):
-        return self.__list
-
-class tm_data():
-    def __init__(self, list):
-        self.__list = list
-    def get_list(self):
-        return self.__list
-
 class login_view(views.View):
     def __init__(self):
         self.db = POOL.connection()
@@ -62,7 +56,6 @@ class login_view(views.View):
 
     def dispatch_request(self):
         if request.method == "POST":
-            #获取 POST 参数
             username = request.form.get("account")
             password = request.form.get("password")
             remember = request.form.get("remember")
@@ -77,17 +70,14 @@ class login_view(views.View):
                         session.permanent = True
                     return redirect("/")
                 else:
-                    #登录失败 待完善
                     return 'not permitted'
             else:
-                #登录失败 待完善
                 return 'not permitted'
         else:
             if session.get('user'):
                 #已登录
                 return redirect("/")
             else:
-                #未登录
                 return render_template("login.html")
 
     def __del__(self):
@@ -171,7 +161,7 @@ class index_view(views.View):
                             temp["term"] = row[3]
                             temp["class"] = row[4]
                             sm_list.append(temp)
-                        data = sm_data(sm_list)
+                        data = m_data(sm_list)
                         return render_template("StuManagement.html", data = data)
                     else:
                         sno = request.form.get("sno")
@@ -291,14 +281,14 @@ class index_view(views.View):
                                     temp["term"] = row[3]
                                     temp["class"] = row[4]
                                     sm_list.append(temp)
-                                data = sm_data(sm_list)
+                                data = m_data(sm_list)
                                 return render_template("StuManagement.html", data = data)
                             else:
                                 return "非法输入"
                 elif action == "tm":
                     #教师管理
                     if request.method == "GET":
-                        self.cursor.execute("select Tno, Tname, Tgender, Tclass, Cname from teacher join course on teacher.Tclass = course.cno")
+                        self.cursor.execute("select Tno, Tname, Tgender, Tclass, Cname from teacher left join course on teacher.Tclass = course.cno")
                         rows = self.cursor.fetchall()
                         tm_list = []
                         for row in rows:
@@ -308,8 +298,10 @@ class index_view(views.View):
                             temp["gender"] = row[2]
                             temp["class"] = row[3]
                             temp["cname"] = row[4]
+                            if not row[4]:
+                                temp["cname"] = ""
                             tm_list.append(temp)
-                        data = tm_data(tm_list)
+                        data = m_data(tm_list)
                         return render_template("TeaManagement.html", data = data)
                     else:
                         tno = request.form.get("tno")
@@ -319,17 +311,17 @@ class index_view(views.View):
                         mode = request.form.get("mode")
                         if mode == "add":
                             #添加教师
-                            if tno and name and gender and classno:
+                            if tno and name and gender and  classno:
                                 #不可为空
                                 if self.input_valid(tno) and self.input_valid(name) and self.input_valid(gender) and self.input_valid(classno):
                                     #输入合法
                                     self.cursor.execute("select Cno from course where Cno = '" + classno + "'")
-                                    cno = self.cursor.fetchone()
+                                    cno1 = self.cursor.fetchone()
                                     self.cursor.execute("select Tno from teacher where Tno = '" + tno + "'")
                                     tno1 = self.cursor.fetchone()
                                     if tno1:
                                         return "此教工号已存在"
-                                    if not cno:
+                                    if not cno1:
                                         return "课程号不存在"
                                     try:
                                         self.cursor.execute("insert into teacher values('" + tno + "', '" + name + "', '" + gender + "', '" + classno + "')")
@@ -398,7 +390,7 @@ class index_view(views.View):
                                 return "教工号不能为空"
                         elif mode == "search":
                             #查询教师信息
-                            sql = "select Tno, Tname, Tgender, Tclass, Cname from teacher join course on teacher.Tclass = course.cno"
+                            sql = "select Tno, Tname, Tgender, Tclass, Cname from teacher left join course on teacher.Tclass = course.cno"
                             if self.input_valid(tno) and self.input_valid(name) and self.input_valid(gender) and self.input_valid(classno):
                                 #输入合法
                                 if tno:
@@ -419,17 +411,164 @@ class index_view(views.View):
                                     temp["gender"] = row[2]
                                     temp["class"] = row[3]
                                     temp["cname"] = row[4]
+                                    if not row[4]:
+                                        temp["cname"] = ""
                                     tm_list.append(temp)
-                                data = tm_data(tm_list)
+                                data = m_data(tm_list)
                                 return render_template("TeaManagement.html", data = data)
                             else:
                                 return "非法输入"
                 elif action == "cm":
                     #课程管理
-                    return "cm"
+                    if request.method == "GET":
+                        self.cursor.execute("select Cno, Cname from course")
+                        rows = self.cursor.fetchall()
+                        cm_list = []
+                        for row in rows:
+                            temp = {}
+                            temp["cno"] = row[0]
+                            temp["cname"] = row[1]
+                            self.cursor.execute("select Tname from teacher where Tclass = '" + row[0] + "'")
+                            courses = self.cursor.fetchall()
+                            teachers = ""
+                            has_tea = False
+                            for tea in courses:
+                                if has_tea:
+                                    #教师名枚举
+                                    teachers += ("、" + tea[0])
+                                else:
+                                    has_tea = True
+                                    teachers += tea[0]
+                            temp["teachers"] = teachers
+                            cm_list.append(temp)
+                        data = m_data(cm_list)
+                        return render_template("CouManagement.html", data = data)
+                    else:
+                        cno = request.form.get("cno")
+                        cname = request.form.get("cname")
+                        mode = request.form.get("mode")
+                        if mode == "add":
+                            #添加课程
+                            if cno and cname:
+                                #不可为空
+                                if self.input_valid(cno) and self.input_valid(cname):
+                                    #输入合法
+                                    self.cursor.execute("select Cno from course where Cno = '" + cno + "'")
+                                    cno1 = self.cursor.fetchone()
+                                    if cno1:
+                                        return "此课程号已存在"
+                                    try:
+                                        self.cursor.execute("insert into course values('" + cno + "', '" + cname + "')")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
+                                    return redirect("/?action=cm")
+                                else:
+                                    return "非法输入"
+                            else:
+                                return "任意一项内容均不能为空"
+                        elif mode == "delete":
+                            #删除课程
+                            if cno:
+                                #课程号不可为空
+                                if self.input_valid(cno):
+                                    #输入合法
+                                    self.cursor.execute("select Cno from course where Cno = '" + cno + "'")
+                                    cno1 = self.cursor.fetchone()
+                                    if not cno1:
+                                        return "此课程号不存在"
+                                    try:
+                                        self.cursor.execute("update student set Sclass = '' where Sclass = '" + cno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
+                                    try:
+                                        self.cursor.execute("update teacher set Tclass = '' where Tclass = '" + cno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
+                                    try:
+                                        self.cursor.execute("delete from course where cno = '" + cno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
+                                    return redirect("/?action=cm")
+                                else:
+                                    return "非法输入"
+                            else:
+                                return "课程号不能为空"
+                        elif mode == "search":
+                            #查询课程信息
+                            sql = "select Cno, Cname from course where '1' = '1'"
+                            if self.input_valid(cno) and self.input_valid(cname):
+                                #输入合法
+                                if cno:
+                                    sql += " and Cno = '" + cno + "'"
+                                if cname:
+                                    sql += " and Cname = '" +cname + "'"
+                                self.cursor.execute(sql)
+                                rows = self.cursor.fetchall()
+                                cm_list = []
+                                for row in rows:
+                                    temp = {}
+                                    temp["cno"] = row[0]
+                                    temp["cname"] = row[1]
+                                    self.cursor.execute("select Tname from teacher where Tclass = '" + row[0] + "'")
+                                    courses = self.cursor.fetchall()
+                                    teachers = ""
+                                    has_tea = False
+                                    for tea in courses:
+                                        if has_tea:
+                                            #教师名枚举
+                                            teachers += ("、" + tea[0])
+                                        else:
+                                            has_tea = True
+                                            teachers += tea[0]
+                                    temp["teachers"] = teachers
+                                    cm_list.append(temp)
+                                data = m_data(cm_list)
+                                return render_template("CouManagement.html", data = data)
+                            else:
+                                return "非法输入"
                 elif action == "um":
                     #用户管理
-                    return "um"
+                    if request.method == "GET":
+                        self.cursor.execute("select username, password, role from user")
+                        rows = self.cursor.fetchall()
+                        um_list = []
+                        for row in rows:
+                            temp = {}
+                            temp["username"] = row[0]
+                            temp["password"] = row[1]
+                            temp["role"] = row[2]
+                            um_list.append(temp)
+                        data = m_data(um_list)
+                        return render_template("UserManagement.html", data = data)
+                    else:
+                        #修改密码
+                        username = request.form.get("username")
+                        password = request.form.get("password")
+                        repeat = request.form.get("repeat")
+                        if username and password and repeat:
+                            #教工号不可为空
+                            if self.input_valid(username) and self.input_valid(password) and self.input_valid(repeat):
+                                #输入合法
+                                self.cursor.execute("select username from user where username = '" + username + "'")
+                                usn1 = self.cursor.fetchone()
+                                if not usn1:
+                                    return "此用户不存在"
+                                if password != repeat:
+                                    return "两次输入密码不一致"
+                                try:
+                                    self.cursor.execute("update user set password = '" + password + "' where username = '" + username + "'")
+                                    self.db.commit()
+                                except:
+                                    self.db.rollback()
+                                return redirect("/?action=um")
+                            else:
+                                return "非法输入"
+                        else:
+                            return "任意一项内容均不能为空"
                 else:
                     return redirect("/?action=sm")
             elif role == 'teacher':

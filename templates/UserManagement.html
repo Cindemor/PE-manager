@@ -4,21 +4,21 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="CSS/UserManagement.css" />
-    <script src="JS/Management.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/UserManagement.css') }}" />
+    <script src="{{ url_for('static', filename='js/StuManagement.js') }}"></script>
     <div id="header">
-        <img id="img" src="IMG/header.png" />
-        <a id="exit" href="#">退出系统</a>
+        <img id="img" src="{{ url_for('static', filename='img/header.png') }}" />
+        <a id="exit" href="/logout">退出系统</a>
         <div id="header-font">
             <p id="logo">体育课成绩管理系统</p>
         </div>
     </div>
     <div id="navigation">
         <nav>
-            <a id="mainfunction" href="StuManagement.html">学生管理</a>
-            <a id="mainfunction" href="TeaManagement.html">教师管理</a>
-            <a id="mainfunction" href="CouManagement.html">课程管理</a>
-            <a id="mainfunction" href="#">账户管理</a>
+            <a id="mainfunction" href="/?action=sm">学生管理</a>
+            <a id="mainfunction" href="/?action=tm">教师管理</a>
+            <a id="mainfunction" href="/?action=cm">课程管理</a>
+            <a id="mainfunction" href="#" style="background-color: #b6b2b2;">账户管理</a>
         </nav>
     </div>
     <div id="leftpart">
@@ -26,19 +26,20 @@
             <form method="post" id="form">
                 <table id="information" border="0" cellpadding="5" cellspacing="10">
                     <tr>
-                        <td id="rightalign" name="1-1">账号：</td>
-                        <td id="leftalign"><input type="text" id="input" name="1-2"></td>
+                        <td id="rightalign">账号：</td>
+                        <td id="leftalign"><input type="text" id="input" name="username"></td>
                     </tr>
                     <tr>
-                        <td id="rightalign" name="2-1">新密码：</td>
-                        <td id="leftalign"><input type="password" id="input" name="2-2"></td>
+                        <td id="rightalign">新密码：</td>
+                        <td id="leftalign"><input type="password" id="input" name="password"></td>
                     </tr>
                     <tr>
-                        <td id="rightalign" name="3-1">确认密码：</td>
-                        <td id="leftalign"><input type="password" id="input" name="3-2"></td>
+                        <td id="rightalign">确认密码：</td>
+                        <td id="leftalign"><input type="password" id="input" name="repeat"></td>
                     </tr>
                 </table>
-                <input type="submit" value="确认" id="submit" onclick="aftersubmit()" />
+                <input type="hidden" id="mode" name="mode" value="">
+                <input type="submit" value="确认" id="submit"/>
                 <!--单击确认后，学生基本信息应实时更新呈现在页面表单上-->
             </form>
         </div>
@@ -46,7 +47,7 @@
             操作说明
         </div>
         <div id="onefunction">
-            <input type="button" id="button" value="修改密码" onclick="Management()" />
+            <input class="button" type="button" id="update" value="修改密码" onclick="StuManagement(this.id)"/>
         </div>
     </div>
     <div id="showresult">
@@ -57,7 +58,13 @@
                 <td>密码</td>
                 <td>用户类型</td>
             </tr>
-            <!--下面for循环可以添加tr行和每个tr行里3个td-->
+            {% for row in data.get_list() %}
+            <tr>
+                <td>{{ row['username'] }}</td>
+                <td>{{ row['password'] }}</td>
+                <td>{{ row['role'] }}</td>
+            </tr>
+            {% endfor %}
         </table>
     </div>
 </body>

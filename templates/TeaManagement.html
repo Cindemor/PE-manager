@@ -4,11 +4,11 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/StuManagement.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/TeaManagement.css') }}" />
     <script src="{{ url_for('static', filename='js/StuManagement.js') }}"></script>
     <div id="header">
         <img id="img" src="{{ url_for('static', filename='img/header.png') }}" />
-        <a id="exit" href="#">退出系统</a>
+        <a id="exit" href="/logout">退出系统</a>
         <div id="header-font">
             <p id="logo">体育课成绩管理系统</p>
         </div>
@@ -16,7 +16,7 @@
     <div id="navigation">
         <nav>
             <a id="mainfunction" href="/?action=sm">学生管理</a>
-            <a id="mainfunction" href="#">教师管理</a>
+            <a id="mainfunction" href="#" style="background-color: #b6b2b2;">教师管理</a>
             <a id="mainfunction" href="/?action=cm">课程管理</a>
             <a id="mainfunction" href="/?action=um">账户管理</a>
         </nav>
