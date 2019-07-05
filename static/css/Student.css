@@ -1,0 +1,63 @@
+﻿#container{
+    width:100%;
+}
+#header{
+    width:100%;
+    height:100px;
+    position:relative;
+}
+#img{
+    width:100%;
+    height:100%;
+}
+#header-font {
+    height:100%;
+    margin-left:20%;
+    margin-top:-104px;
+    position:absolute;
+}
+#logo {
+    font-family:STXinwei;
+    color: #dbdbdb;
+    font-size: 40px;
+    font-weight: bold;
+    margin-top: 26.8px;
+}
+#prograde {
+    width: 25%;
+    background-color: #EEEEEE;
+    margin-left: 60%;
+    text-align:center;
+}
+#progradetitle {
+    font-family:"宋体";
+    font-weight: bolder;
+    font-size: large;
+    color: #CC0000;
+    margin-bottom:5px;
+}
+#information{
+    width:20%;
+    margin-left:20%;
+    float:left;
+}
+#rightalign{
+    text-align:right;
+    font-size:20px;
+    font-family:KaiTi;  
+}
+#leftalign {
+    text-align: left;
+    font-size: 20px;
+    font-family: KaiTi;
+}
+#exit {
+    margin-top: -100px;
+    margin-left: 90%;
+    float: left;
+    position: absolute;
+    text-decoration: none;
+    color: #dbdbdb;
+    font-family: STXinwei;
+    font-size: 20px
+}

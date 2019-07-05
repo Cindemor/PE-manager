@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Student.css') }}" />
+    <div id="header">
+        <img id="img" src="{{ url_for('static', filename='img/header.png') }}" />
+        <a id="exit" href="/logout">退出系统</a>
+        <div id="header-font">
+            <p id="logo">体育课成绩管理系统</p>
+        </div>
+    </div>
+    <div style="width:100%;margin-top:5%">
+        <table id="information" border="0" cellpadding="15" cellspacing="0">
+            <caption id="progradetitle">基本信息</caption>
+            <tr>
+                <td id="rightalign">学号：</td>
+                <td id="leftalign">{{ data.get_sno() }}</td>
+            </tr>
+            <tr>
+                <td id="rightalign">姓名：</td>
+                <td id="leftalign">{{ data.get_sname() }}</td>
+            </tr>
+            <tr>
+                <td id="rightalign">当前学期：</td>
+                <td id="leftalign">{{ data.get_term() }}</td>
+               <!--数据库里定义的学期是1、2、3、4，这里需要判断改成大一秋、春，大二秋、春4个学期-->
+            </tr>
+            <tr>
+                <td id="rightalign">课程名称：</td>
+                <td id="leftalign">{{ data.get_cname() }}</td>
+            </tr>
+            <tr>
+                <td id="rightalign">总评：</td>
+                <td id="leftalign">{{ data.get_grade() }}</td>
+            </tr>
+
+        </table>
+        <table id="prograde" border="1" cellpadding="3" cellspacing="1">
+            <caption id="progradetitle">单项成绩表</caption>
+            <tr>
+                <td>项目名称</td>
+                <td>项目记录</td>
+                <td>项目得分</td>
+            </tr>
+            {% for row in data.get_list() %}
+            <tr>
+                <td>{{ row['pname'] }}</td>
+                <td>{{ row['record'] }}</td>
+                <td>{{ row['grade'] }}</td>
+            </tr>
+            {% endfor %}
+            <!--下面for循环可以添加tr行和每个tr行里3个td-->
+        </table>
+    </div>
+</body>
+</html>

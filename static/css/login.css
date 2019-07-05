@@ -1,0 +1,92 @@
+﻿#container{
+    width:100%;
+    height:740px;
+    position:relative;
+}
+#img{
+    width:100%;
+    height:100%;
+}
+#logincontainer {
+    width: 40%;
+    height: 400px;  
+    float: left;
+    margin-top: -35%;
+    margin-left: 30%;
+    background-color: #ffffff;
+    border-radius:10px;
+    position: absolute;
+    opacity:0.7;
+
+}
+#title {
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    text-decoration: none;
+    font-family:'Times New Roman', Times, serif;
+    font-weight:bold
+}
+#account {
+    width: 40%;
+    height: 30px;
+    float: left;
+    border-radius: 5px;
+    margin-top: 5%;
+    margin-left: 30%;
+    border: 1px solid #357ebd;
+    padding: 3px;
+    outline: none;
+}
+#password {
+    width: 40%;
+    height: 30px;
+    float: left;
+    border-radius: 5px;
+    margin-top: 5%;
+    margin-left: 30%;
+    border: 1px solid #357ebd;
+    padding: 3px;
+    outline: none;
+}
+#submit {
+    width: 26%;
+    height: 50px;
+    margin-top: 2.5%;
+    margin-left: 37%;
+    font-weight:500;
+    background-color: #428bca;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color:white;
+    font-size:large;
+    outline:none;
+}
+    #submit:hover {
+        width: 26%;
+        height: 50px;
+        margin-top: 2.5%;
+        margin-left: 37%;
+        font-weight: 500;
+        background-color: #357ebd;
+        cursor: pointer;
+        border-radius: 5px;
+        border:1px solid #357ebd;
+        color:white;
+        font-size:large;
+        outline:none;
+    }
+#logincup {
+    width: 50%;
+    height: 300px;
+    float: left;
+    margin-top: -30%;
+    margin-left: 25%;
+    background-color: transparent;
+    border-radius: 10px;
+    position: absolute;
+}
+#checkbox{
+    margin-top:2.5%;
+    margin-left:45%;
+}
