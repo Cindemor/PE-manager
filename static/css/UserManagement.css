@@ -59,91 +59,105 @@
     padding-right: 20px;
     padding-left: 20px;
 }
-#mainfunction:hover {
-    text-decoration: none;
-    font-family: KaiTi;
-    font-size: 20px;
-    color: #322f2f;
-    font-weight: bold;
-    background-color: #b6b2b2;
-    height: 50px;
+
+    #mainfunction:hover {
+        text-decoration: none;
+        font-family: KaiTi;
+        font-size: 20px;
+        color: #322f2f;
+        font-weight: bold;
+        background-color: #b6b2b2;
+        height: 50px;
+    }
+.operationintroduction {
+    width: 100%;
+    height: 60%;
+    background-color: aqua;
 }
-.operationintroduction{
-    width:100%;
-    height:80%;
-}
+
 #operationintroduction {
     width: 100%;
-    height: 80%;
+    height: 60%;
+    background-color: aqua;
 }
+
 .operation {
     width: 100%;
-    height: 80%;
+    height: 60%;
 }
-#operation{
-    width:100%;
-    height:80%;
+
+#operation {
+    width: 100%;
+    height: 60%;
 }
-#showresult{
-    width:70%;
-    margin-left:30%;
-    height:500px;
+
+#showresult {
+    width: 70%;
+    margin-left: 30%;
+    height: 500px;
 }
+
 #prograde {
-    width: 60%;
+    width: 50%;
     background-color: #EEEEEE;
-    margin-left: 20%;
+    margin-left: 25%;
     text-align: center;
 }
+
 #progradetitle {
     font-family: "宋体";
     font-weight: bolder;
     font-size: large;
     color: #CC0000;
     margin-bottom: 5px;
-    margin-top:20px;
+    margin-top: 20px;
 }
+
 #information {
     width: 80%;
     margin-left: 10%;
-    margin-top:20px;
+    margin-top: 20px;
 }
 
 #rightalign {
     text-align: right;
-    font-size: 15px;
-    font-family:KaiTi;
-    font-weight:bold;
+    font-size: 20px;
+    font-family: KaiTi;
+    font-weight: bold;
 }
+
 #leftalign {
     text-align: left;
 }
+
 #input {
-    height: 21px;
+    height: 26px;
     border-radius: 5px;
     border: 1px solid #357ebd;
     padding: 3px;
-    font-size: 15px;
-    font-weight:bold;
     outline: none;
     font-family: KaiTi;
+    font-size: 18px;
+    font-weight: bold;
 }
+
 #submit {
     width: 15%;
-    height: 12.5%;
+    height: 22.2%;
     font-weight: 500;
-    margin-top:5%;
-    margin-left:42.5%;
+    margin-top: 5%;
+    margin-left: 42.5%;
     background-color: #428bca;
     border-radius: 5px;
     border: 1px solid #357ebd;
     color: white;
     font-size: large;
-    outline:none;
+    outline: none;
 }
+
     #submit:hover {
         width: 15%;
-        height: 12.5%;
+        height: 22.2%;
         margin-top: 5%;
         margin-left: 42.5%;
         font-weight: 500;
@@ -153,21 +167,25 @@
         border: 1px solid #357ebd;
         color: white;
         font-size: large;
-        outline:none;
+        outline: none;
     }
-#fourfunction{
-    height:20%;
-    width:100%;
+
+#onefunction {
+    margin-top: 20%;
+    height: 30%;
+    width: 100%;
 }
-#leftpart{
-    width:30%;
-    height:400px;
-    float:left;
+
+#leftpart {
+    width: 30%;
+    height: 300px;
+    float: left;
 }
-.button {
+
+#button {
     width: 20%;
-    height: 50%;
-    margin-left: 4%;
+    height: 44.4%;
+    margin-left: 40%;
     font-weight: 500;
     background-color: #428bca;
     border-radius: 5px;
@@ -176,25 +194,25 @@
     font-size: large;
     outline: none;
 }
-.button:hover {
-    width: 20%;
-    height: 50%;
-    margin-left: 4%;
-    font-weight: 500;
-    background-color: #357ebd;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #357ebd;
-    color: white;
-    font-size: large;
-    outline: none;
+
+    #button:hover {
+        width: 20%;
+        height: 44.4%;
+        margin-left: 40%;
+        font-weight: 500;
+        background-color: #357ebd;
+        cursor: pointer;
+        border-radius: 5px;
+        border: 1px solid #357ebd;
+        color: white;
+        font-size: large;
+        outline: none;
+    }
+
+.hide {
+    display: none;
 }
-.button:focus {
-    background-color: #03a9f4
-}
-.hide{
-    display:none;
-}
-#form{
-    height:100%;
+
+#form {
+    height: 100%;
 }

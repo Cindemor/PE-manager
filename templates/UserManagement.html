@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="CSS/CouManagement.css" />
+    <link rel="stylesheet" type="text/css" href="CSS/UserManagement.css" />
     <script src="JS/Management.js"></script>
     <div id="header">
         <img id="img" src="IMG/header.png" />
@@ -17,8 +17,8 @@
         <nav>
             <a id="mainfunction" href="StuManagement.html">学生管理</a>
             <a id="mainfunction" href="TeaManagement.html">教师管理</a>
-            <a id="mainfunction" href="#">课程管理</a>
-            <a id="mainfunction" href="UserManagement.html">账户管理</a>
+            <a id="mainfunction" href="CouManagement.html">课程管理</a>
+            <a id="mainfunction" href="#">账户管理</a>
         </nav>
     </div>
     <div id="leftpart">
@@ -26,12 +26,16 @@
             <form method="post" id="form">
                 <table id="information" border="0" cellpadding="5" cellspacing="10">
                     <tr>
-                        <td id="rightalign" name="1-1">课程号：</td>
+                        <td id="rightalign" name="1-1">账号：</td>
                         <td id="leftalign"><input type="text" id="input" name="1-2"></td>
                     </tr>
                     <tr>
-                        <td id="rightalign" name="2-1">课程名称：</td>
-                        <td id="leftalign"><input type="text" id="input" name="2-2"></td>
+                        <td id="rightalign" name="2-1">新密码：</td>
+                        <td id="leftalign"><input type="password" id="input" name="2-2"></td>
+                    </tr>
+                    <tr>
+                        <td id="rightalign" name="3-1">确认密码：</td>
+                        <td id="leftalign"><input type="password" id="input" name="3-2"></td>
                     </tr>
                 </table>
                 <input type="submit" value="确认" id="submit" onclick="aftersubmit()" />
@@ -41,19 +45,17 @@
         <div id="operationintroduction" class="operationintroduction">
             操作说明
         </div>
-        <div id="threefunction">
-            <input type="button" id="button" value="添加课程" onclick="Management()" />
-            <input type="button" id="button" value="删除课程" onclick="Management()" />
-            <input type="button" id="button" value="查询课程" onclick="Management()" />
+        <div id="onefunction">
+            <input type="button" id="button" value="修改密码" onclick="Management()" />
         </div>
     </div>
     <div id="showresult">
         <table id="prograde" border="1" cellpadding="3" cellspacing="1">
-            <caption id="progradetitle">课程基本信息</caption>
+            <caption id="progradetitle">账户基本信息</caption>
             <tr>
-                <td>课程号</td>
-                <td>课程名称</td>
-                <td>授课教师</td>
+                <td>账号</td>
+                <td>密码</td>
+                <td>用户类型</td>
             </tr>
             <!--下面for循环可以添加tr行和每个tr行里3个td-->
         </table>

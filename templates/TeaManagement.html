@@ -4,9 +4,10 @@
     <meta charset="utf-8" />
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="CSS/TeaManagement.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/StuManagement.css') }}" />
+    <script src="{{ url_for('static', filename='js/StuManagement.js') }}"></script>
     <div id="header">
-        <img id="img" src="IMG/header.png" />
+        <img id="img" src="{{ url_for('static', filename='img/header.png') }}" />
         <a id="exit" href="#">退出系统</a>
         <div id="header-font">
             <p id="logo">体育课成绩管理系统</p>
@@ -14,10 +15,68 @@
     </div>
     <div id="navigation">
         <nav>
-            <a id="mainfunction" href="StuManagement.html">学生管理</a>
+            <a id="mainfunction" href="/?action=sm">学生管理</a>
             <a id="mainfunction" href="#">教师管理</a>
-            <a id="mainfunction" href="CouManagement.html">课程管理</a>
+            <a id="mainfunction" href="/?action=cm">课程管理</a>
+            <a id="mainfunction" href="/?action=um">账户管理</a>
         </nav>
+    </div>
+    <div id="leftpart">
+        <div id="operation" class="operation hide">
+            <form method="post" id="form">
+                <table id="information" border="0" cellpadding="5" cellspacing="0">
+                    <tr>
+                        <td id="rightalign">工号：</td>
+                        <td id="leftalign"><input type="text" id="input" name="tno"></td>
+                    </tr>
+                    <tr>
+                        <td id="rightalign">姓名：</td>
+                        <td id="leftalign"><input type="text" id="input" name="name"></td>
+                    </tr>
+                    <tr>
+                        <td id="rightalign">性别：</td>
+                        <td id="leftalign"><input type="text" id="input" name="gender"></td>
+                    </tr>
+                    <tr>
+                        <td id="rightalign">授课编号：</td>
+                        <td id="leftalign"><input type="text" id="input" name="class"></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="mode" name="mode" value="">
+                <input type="submit" value="确认" id="submit"/>
+                <!--单击确认后，学生基本信息应实时更新呈现在页面表单上-->
+            </form>
+        </div>
+        <div id="operationintroduction" class="operationintroduction">
+            操作说明
+        </div>
+        <div id="fourfunction">
+            <input class="button" type="button" id="add" value="添加教师"onclick="StuManagement(this.id)" />
+            <input class="button" type="button" id="delete" value="删除教师"onclick="StuManagement(this.id)" />
+            <input class="button" type="button" id="update" value="修改信息"onclick="StuManagement(this.id)" />
+            <input class="button" type="button" id="search" value="查询教师"onclick="StuManagement(this.id)" />
+        </div>
+    </div>
+    <div id="showresult">
+        <table id="prograde" border="1" cellpadding="3" cellspacing="1">
+            <caption id="progradetitle">教师基本信息</caption>
+            <tr>
+                <td>工号</td>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>授课编号</td>
+                <td>授课名称</td>
+            </tr>
+            {% for row in data.get_list() %}
+            <tr>
+                <td>{{ row['tno'] }}</td>
+                <td>{{ row['name'] }}</td>
+                <td>{{ row['gender'] }}</td>
+                <td>{{ row['class'] }}</td>
+                <td>{{ row['cname'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 </body>
 </html>
