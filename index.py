@@ -54,6 +54,18 @@ class login_view(views.View):
                 return False
         return True
 
+    def make_msg(self, err):
+        if err == "1":
+            msg = "用户名或密码不正确"
+        code = """
+        <script>
+            window.onload = function() {
+                alert('""" + msg + """')
+            }
+        </script>
+        """
+        return code
+
     def dispatch_request(self):
         if request.method == "POST":
             username = request.form.get("account")
@@ -70,15 +82,19 @@ class login_view(views.View):
                         session.permanent = True
                     return redirect("/")
                 else:
-                    return 'not permitted'
+                    return redirect("/login?err=1")
             else:
-                return 'not permitted'
+                return redirect("/login?err=1")
         else:
             if session.get('user'):
                 #已登录
                 return redirect("/")
             else:
-                return render_template("login.html")
+                err = request.args.get("err")
+                if err:
+                    return render_template("login.html", msg = self.make_msg(err))
+                else:
+                    return render_template("login.html")
 
     def __del__(self):
         self.cursor.close()
@@ -102,6 +118,44 @@ class index_view(views.View):
         else:
             res = record + unit
         return res
+
+    def make_msg(self, err):
+        if err == "1":
+            msg = "用户名或密码不正确"
+        elif err == "2":
+            msg = "非法输入"
+        elif err == "3":
+            msg = "任意一项内容均不能为空"
+        elif err == "4":
+            msg = "学号已存在"
+        elif err == "5":
+            msg = "学号不存在"
+        elif err == "6":
+            msg = "学号不能为空"
+        elif err == "7":
+            msg = "课程号已存在"
+        elif err == "8":
+            msg = "课程号不存在"
+        elif err == "9":
+            msg = "课程号不能为空"
+        elif err == "10":
+            msg = "教工号已存在"
+        elif err == "11":
+            msg = "教工号不存在"
+        elif err == "12":
+            msg = "教工号不能为空"
+        elif err == "13":
+            msg = "用户不存在"
+        elif err == "14":
+            msg = "两次输入的密码不一致"
+        code = """
+        <script>
+            window.onload = function() {
+                alert('""" + msg + """')
+            }
+        </script>
+        """
+        return code
 
     def dispatch_request(self):
         if not session.get('user'):
@@ -162,7 +216,11 @@ class index_view(views.View):
                             temp["class"] = row[4]
                             sm_list.append(temp)
                         data = m_data(sm_list)
-                        return render_template("StuManagement.html", data = data)
+                        err = request.args.get("err")
+                        if err:
+                            return render_template("StuManagement.html", data = data, msg = self.make_msg(err))
+                        else:
+                            return render_template("StuManagement.html", data = data)
                     else:
                         sno = request.form.get("sno")
                         name = request.form.get("name")
@@ -181,9 +239,9 @@ class index_view(views.View):
                                     self.cursor.execute("select Sno from student where Sno = '" + sno + "'")
                                     sno1 = self.cursor.fetchone()
                                     if sno1:
-                                        return "此学号已存在"
+                                        return redirect("/?action=sm&err=4")
                                     if not cno:
-                                        return "课程号不存在"
+                                        return redirect("/?action=sm&err=8")
                                     try:
                                         self.cursor.execute("insert into student values('" + sno + "', '" + name + "', '" + gender + "', '" + term + "', '" + classno + "', NULL)")
                                         self.db.commit()
@@ -196,9 +254,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=sm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=sm&err=2")
                             else:
-                                return "任意一项内容均不能为空"
+                                return redirect("/?action=sm&err=3")
                         elif mode == "delete":
                             #删除学生
                             if sno:
@@ -208,7 +266,7 @@ class index_view(views.View):
                                     self.cursor.execute("select Sno from student where Sno = '" + sno + "'")
                                     sno1 = self.cursor.fetchone()
                                     if not sno1:
-                                        return "此学号不存在"
+                                        return redirect("/?action=sm&err=5")
                                     try:
                                         self.cursor.execute("delete from student where sno = '" + sno + "'")
                                         self.db.commit()
@@ -221,9 +279,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=sm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=sm&err=2")
                             else:
-                                return "学号不能为空"
+                                return redirect("/?action=sm&err=6")
                         elif mode == "update":
                             #更新学生信息
                             if sno:
@@ -233,7 +291,7 @@ class index_view(views.View):
                                     self.cursor.execute("select Sno from student where Sno = '" + sno + "'")
                                     sno1 = self.cursor.fetchone()
                                     if not sno1:
-                                        return "此学号不存在"
+                                        return redirect("/?action=sm&err=5")
                                     if term:
                                         try:
                                             self.cursor.execute("update student set Term = '" + term + "' where Sno = '" + sno + "'")
@@ -244,7 +302,7 @@ class index_view(views.View):
                                         self.cursor.execute("select Cno from course where Cno = '" + classno + "'")
                                         cno = self.cursor.fetchone()
                                         if not cno:
-                                            return "课程号不存在"
+                                            return redirect("/?action=sm&err=8")
                                         try:
                                             self.cursor.execute("update student set Sclass = '" + classno + "' where Sno = '" + sno + "'")
                                             self.db.commit()
@@ -252,9 +310,9 @@ class index_view(views.View):
                                             self.db.rollback()
                                     return redirect("/?action=sm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=sm&err=2")
                             else:
-                                return "学号不能为空"
+                                return redirect("/?action=sm&err=6")
                         elif mode == "search":
                             #查询学生信息
                             sql = "select Sno, Sname, Sgender, Term, Sclass from student where '1' = '1'"
@@ -284,7 +342,7 @@ class index_view(views.View):
                                 data = m_data(sm_list)
                                 return render_template("StuManagement.html", data = data)
                             else:
-                                return "非法输入"
+                                return redirect("/?action=sm&err=2")
                 elif action == "tm":
                     #教师管理
                     if request.method == "GET":
@@ -302,7 +360,11 @@ class index_view(views.View):
                                 temp["cname"] = ""
                             tm_list.append(temp)
                         data = m_data(tm_list)
-                        return render_template("TeaManagement.html", data = data)
+                        err = request.args.get("err")
+                        if err:
+                            return render_template("TeaManagement.html", data = data, msg = self.make_msg(err))
+                        else:
+                            return render_template("TeaManagement.html", data = data)
                     else:
                         tno = request.form.get("tno")
                         name = request.form.get("name")
@@ -320,9 +382,9 @@ class index_view(views.View):
                                     self.cursor.execute("select Tno from teacher where Tno = '" + tno + "'")
                                     tno1 = self.cursor.fetchone()
                                     if tno1:
-                                        return "此教工号已存在"
+                                        return redirect("/?action=tm&err=10")
                                     if not cno1:
-                                        return "课程号不存在"
+                                        return redirect("/?action=tm&err=8")
                                     try:
                                         self.cursor.execute("insert into teacher values('" + tno + "', '" + name + "', '" + gender + "', '" + classno + "')")
                                         self.db.commit()
@@ -335,9 +397,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=tm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=tm&err=2")
                             else:
-                                return "任意一项内容均不能为空"
+                                return redirect("/?action=tm&err=3")
                         elif mode == "delete":
                             #删除教师
                             if tno:
@@ -347,7 +409,7 @@ class index_view(views.View):
                                     self.cursor.execute("select Tno from teacher where Tno = '" + tno + "'")
                                     tno1 = self.cursor.fetchone()
                                     if not tno1:
-                                        return "此教工号不存在"
+                                        return redirect("/?action=tm&err=11")
                                     try:
                                         self.cursor.execute("delete from teacher where Tno = '" + tno + "'")
                                         self.db.commit()
@@ -360,9 +422,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=tm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=tm&err=2")
                             else:
-                                return "教工号不能为空"
+                                return redirect("/?action=tm&err=12")
                         elif mode == "update":
                             #更新教师信息
                             if tno:
@@ -372,12 +434,12 @@ class index_view(views.View):
                                     self.cursor.execute("select Tno from teacher where Tno = '" + tno + "'")
                                     tno1 = self.cursor.fetchone()
                                     if not tno1:
-                                        return "此教工号不存在"
+                                        return redirect("/?action=tm&err=11")
                                     if classno:
                                         self.cursor.execute("select Cno from course where Cno = '" + classno + "'")
                                         cno = self.cursor.fetchone()
                                         if not cno:
-                                            return "课程号不存在"
+                                            return redirect("/?action=tm&err=8")
                                         try:
                                             self.cursor.execute("update teacher set Tclass = '" + classno + "' where Tno = '" + tno + "'")
                                             self.db.commit()
@@ -385,9 +447,9 @@ class index_view(views.View):
                                             self.db.rollback()
                                     return redirect("/?action=tm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=tm&err=2")
                             else:
-                                return "教工号不能为空"
+                                return redirect("/?action=tm&err=12")
                         elif mode == "search":
                             #查询教师信息
                             sql = "select Tno, Tname, Tgender, Tclass, Cname from teacher left join course on teacher.Tclass = course.cno"
@@ -417,7 +479,7 @@ class index_view(views.View):
                                 data = m_data(tm_list)
                                 return render_template("TeaManagement.html", data = data)
                             else:
-                                return "非法输入"
+                                return redirect("/?action=tm&err=2")
                 elif action == "cm":
                     #课程管理
                     if request.method == "GET":
@@ -442,7 +504,11 @@ class index_view(views.View):
                             temp["teachers"] = teachers
                             cm_list.append(temp)
                         data = m_data(cm_list)
-                        return render_template("CouManagement.html", data = data)
+                        err = request.args.get("err")
+                        if err:
+                            return render_template("CouManagement.html", data = data, msg = self.make_msg(err))
+                        else:
+                            return render_template("CouManagement.html", data = data)
                     else:
                         cno = request.form.get("cno")
                         cname = request.form.get("cname")
@@ -456,7 +522,7 @@ class index_view(views.View):
                                     self.cursor.execute("select Cno from course where Cno = '" + cno + "'")
                                     cno1 = self.cursor.fetchone()
                                     if cno1:
-                                        return "此课程号已存在"
+                                        return redirect("/?action=cm&err=7")
                                     try:
                                         self.cursor.execute("insert into course values('" + cno + "', '" + cname + "')")
                                         self.db.commit()
@@ -464,9 +530,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=cm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=cm&err=2")
                             else:
-                                return "任意一项内容均不能为空"
+                                return redirect("/?action=cm&err=3")
                         elif mode == "delete":
                             #删除课程
                             if cno:
@@ -476,7 +542,7 @@ class index_view(views.View):
                                     self.cursor.execute("select Cno from course where Cno = '" + cno + "'")
                                     cno1 = self.cursor.fetchone()
                                     if not cno1:
-                                        return "此课程号不存在"
+                                        return redirect("/?action=cm&err=8")
                                     try:
                                         self.cursor.execute("update student set Sclass = '' where Sclass = '" + cno + "'")
                                         self.db.commit()
@@ -494,9 +560,9 @@ class index_view(views.View):
                                         self.db.rollback()
                                     return redirect("/?action=cm")
                                 else:
-                                    return "非法输入"
+                                    return redirect("/?action=cm&err=2")
                             else:
-                                return "课程号不能为空"
+                                return redirect("/?action=cm&err=9")
                         elif mode == "search":
                             #查询课程信息
                             sql = "select Cno, Cname from course where '1' = '1'"
@@ -529,7 +595,7 @@ class index_view(views.View):
                                 data = m_data(cm_list)
                                 return render_template("CouManagement.html", data = data)
                             else:
-                                return "非法输入"
+                                return redirect("/?action=cm&err=2")
                 elif action == "um":
                     #用户管理
                     if request.method == "GET":
@@ -543,7 +609,11 @@ class index_view(views.View):
                             temp["role"] = row[2]
                             um_list.append(temp)
                         data = m_data(um_list)
-                        return render_template("UserManagement.html", data = data)
+                        err = request.args.get("err")
+                        if err:
+                            return render_template("UserManagement.html", data = data, msg = self.make_msg(err))
+                        else:
+                            return render_template("UserManagement.html", data = data)
                     else:
                         #修改密码
                         username = request.form.get("username")
@@ -556,9 +626,9 @@ class index_view(views.View):
                                 self.cursor.execute("select username from user where username = '" + username + "'")
                                 usn1 = self.cursor.fetchone()
                                 if not usn1:
-                                    return "此用户不存在"
+                                    return redirect("/?action=um&err=13")
                                 if password != repeat:
-                                    return "两次输入密码不一致"
+                                    return redirect("/?action=um&err=14")
                                 try:
                                     self.cursor.execute("update user set password = '" + password + "' where username = '" + username + "'")
                                     self.db.commit()
@@ -566,15 +636,15 @@ class index_view(views.View):
                                     self.db.rollback()
                                 return redirect("/?action=um")
                             else:
-                                return "非法输入"
+                                return redirect("/?action=um&err=2")
                         else:
-                            return "任意一项内容均不能为空"
+                            return redirect("/?action=um&err=3")
                 else:
                     return redirect("/?action=sm")
             elif role == 'teacher':
                 return render_template("Teacher.html")
         else:
-            return 'not permitted'
+            return redirect("/login")
 
 
     def __del__(self):
