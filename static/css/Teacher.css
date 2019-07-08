@@ -33,3 +33,106 @@
     font-family: STXinwei;
     font-size: 20px
 }
+#firsttable {
+    width: 40%;
+    background-color: #EEEEEE;
+    margin-left: 30%;
+    text-align: center;
+    margin-top:2%;
+}
+#firsttabletitle {
+    font-family: "宋体";
+    font-weight: bolder;
+    font-size: large;
+    color: #CC0000;
+    margin-bottom: 5px;
+}
+#secondtable {
+    background-color: #EEEEEE;
+    text-align: center;
+    margin-top: 1%;
+    width:150%
+}
+#secondtabletitle {
+    font-family: "宋体";
+    font-weight: bolder;
+    font-size: large;
+    color: #CC0000;
+    text-align:center;
+}
+#inputgrade {
+    margin-top: 2%;
+    margin-bottom:2%;
+}
+.button {
+    width: 8%;
+    height:40px;
+    margin-left:46%;
+    font-weight: 500;
+    background-color: #428bca;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color: white;
+    font-size: large;
+    outline: none;
+}
+.button:hover {
+    background-color: #357ebd;
+    cursor: pointer;
+}
+.operation{
+    margin-top:2%;
+    width:80%;
+    margin-left:10%;
+}
+#tdinput {
+    background-color: #EEEEEE;
+    border: 0;
+    outline: none;
+    text-align: center;
+    width: 100px;
+}
+td {
+    width: 100px;
+}
+.add {
+    width: 5%;
+    height: 30px;
+    font-weight: 500;
+    background-color: #428bca;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color: white;
+    font-size:medium;
+    outline: none;
+    margin-left:95%;
+}
+.add:hover {
+    background-color: #357ebd;
+    cursor: pointer;
+}
+.calculateexport {
+    width: 9.5%;
+    height: 40px;
+    font-weight: 500;
+    background-color: #428bca;
+    border-radius: 5px;
+    border: 1px solid #357ebd;
+    color: white;
+    font-size:large;
+    outline: none;
+    margin-left: 27%;
+}
+.calculateexport:hover {
+    background-color: #357ebd;
+    cursor: pointer;
+}
+.calculateexportdiv {
+    width: 80%;
+    margin-left: 10%;
+    margin-top:1%;
+}
+.ro {
+    color: #000000;
+    background-color: #e0e0e0 !important;
+}

@@ -2,15 +2,87 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
+    {% autoescape false %}
+    {{ msg }}
+    {% endautoescape %}
 </head>
 <body>
-    <link rel="stylesheet" type="text/css" href="CSS/Teacher.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Teacher.css') }}" />
     <div id="header">
-        <img id="img" src="IMG/header.png" />
-        <a id="exit" href="#">退出系统</a>
+        <img id="img" src="{{ url_for('static', filename='img/header.png') }}" />
+        <a id="exit" href="/logout">退出系统</a>
         <div id="header-font">
             <p id="logo">体育课成绩管理系统</p>
         </div>
+    </div>
+    <div id="operation" class="operation">
+        <p id="secondtabletitle">学生成绩录分表</p>
+        <form method="POST">
+            <div style="overflow-x:scroll">
+                <table id="secondtable" border="1" cellpadding="1" cellspacing="1">
+                    <tr>
+                        <td>学号</td>
+                        <td>姓名</td>
+                        <td>性别</td>
+                        <td>学期</td>
+                        <td>50米(例:<font style="color: red">7.20</font>)</td>
+                        <td>50米得分</td>
+                        <td>体前屈(例:<font style="color: red">12.5</font>)</td>
+                        <td>体前屈得分</td>
+                        <td>立定跳远(例:<font style="color: red">220</font>)</td>
+                        <td>立定跳远得分</td>
+                        <td>引体向上(例:<font style="color: red">15</font>)</td>
+                        <td>引体向上得分</td>
+                        <td>仰卧起坐(例:<font style="color: red">40</font>)</td>
+                        <td>仰卧起坐得分</td>
+                        <td>1000米/800米(例:<font style="color: red">3'40</font>)</td>
+                        <td>1000米/800米得分</td>
+                        <td>跳绳(例:<font style="color: red">170</font>)</td>
+                        <td>跳绳得分</td>
+                        <td>2400米/2000米(例:<font style="color: red">10'30</font>)</td>
+                        <td>2400米/2000米得分</td>
+                        <td>运动世界校园得分</td>
+                        <td>理论得分</td>
+                        <td>考勤得分</td>
+                        <td>专项得分</td>
+                        <td>总评</td>
+                    </tr>
+                    {% for row in data.get_list() %}
+                    <tr>
+                        <td class='ro'><input type='text' id='tdinput' name='{{ row["rn"] }}-sno' value='{{ row["sno"] }}' class='ro' readonly='readonly'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["name"] }}' class='ro' readonly='readonly'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["gender"] }}' class='ro' readonly='readonly'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["term"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-50m' value='{{ row["50m_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["50m_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-push' value='{{ row["push_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["push_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-jump' value='{{ row["jump_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["jump_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-rise' value='{{ row["rise_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["rise_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-up' value='{{ row["up_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["up_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-1000/800m' value='{{ row["1000/800m_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["1000/800m_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-rope' value='{{ row["rope_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["rope_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-2400/2000m' value='{{ row["2400/2000m_r"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["2400/2000m_s"] }}' class='ro' readonly='readonly'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-app' value='{{ row["app"] }}'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-write' value='{{ row["write"] }}'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-sign' value='{{ row["sign"] }}'/></td>
+                        <td><input type='text' id='tdinput' name='{{ row["rn"] }}-special' value='{{ row["special"] }}'/></td>
+                        <td class='ro'><input type='text' id='tdinput' value='{{ row["total"] }}' class='ro' readonly='readonly'/></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div class="calculateexportdiv">
+                <input class="calculateexport" type="submit" value="计算成绩" />
+                <input class="calculateexport" type="submit" value="导出成绩" />
+            </div>
+        </form>
     </div>
 </body>
 </html>

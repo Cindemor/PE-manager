@@ -105,6 +105,48 @@ class index_view(views.View):
     def __init__(self):
         self.db = POOL.connection()
         self.cursor = self.db.cursor()
+        self.project_no = {
+            "50m": "001",
+            "push": "002",
+            "jump": "003",
+            "rise": "004",
+            "up": "005",
+            "1000/800m": "006",
+            "rope": "007",
+            "2400/2000m": "008",
+            "app": "009",
+            "write": "010",
+            "sign": "011",
+            "special": "012"
+        }
+        self.project_na = {
+            "50m": "50米",
+            "push": "坐位体前屈",
+            "jump": "立定跳远",
+            "rise": "引体向上",
+            "up": "仰卧起坐",
+            "1000/800m": "1000米/800米",
+            "rope": "跳绳",
+            "2400/2000m": "2400米/2000米",
+            "app": "运动世界校园",
+            "write": "理论作业",
+            "sign": "考勤",
+            "special": "专项"
+        }
+        self.project_un = {
+            "001" : "秒",
+            "002" : "厘米",
+            "003" : "厘米",
+            "004": "个",
+            "005": "个",
+            "006": "分/秒",
+            "007": "个",
+            "008": "分/秒",
+            "009": "",
+            "010": "",
+            "011": "",
+            "012": ""
+        }
 
     def input_valid(self, words):
         if "'" in words:
@@ -112,12 +154,35 @@ class index_view(views.View):
         return True
 
     def show_record(self, pno, record, unit):
-        res = ""
-        if pno == "002":
-            res = str(int(record) // 60) + "分" + str(int(record) % 60) + "秒"
+        if pno == "006" or pno == "008":
+            res = record.replace('.', '\'')
         else:
             res = record + unit
         return res
+
+    def super_cal(self, pno, record, gender):
+        self.cursor.execute("select record_level, score_level from standard where Pno = '" + pno + "' and gender = '" + gender + "' and record_level >= '" + record + "' order by record_level limit 1 offset 0")
+        up = self.cursor.fetchone()
+        self.cursor.execute("select record_level, score_level from standard where Pno = '" + pno + "' and gender = '" + gender + "' and record_level <= '" + record + "' order by record_level desc limit 1 offset 0")
+        down = self.cursor.fetchone()
+        if pno == '001' or pno == '006' or pno == '008':
+            up, down = down, up
+        if up[0]:
+            up_r = up[0]
+        else:
+            return "100"
+        if down[0]:
+            down_r = down[0]
+        else:
+            return "0"
+        up_s = up[1]
+        down_s = down[1]
+        if up_r - down_r:
+            rate = (float(record) - down_r) / (up_r - down_r)
+        else:
+            rate = 0
+        score = '%(p).2f' % {'p': down_s + ((up_s - down_s) * rate)}
+        return score
 
     def make_msg(self, err):
         if err == "1":
@@ -185,13 +250,18 @@ class index_view(views.View):
                 rows = self.cursor.fetchall()
                 pro_list = []
                 for row in rows:
+                    if not row[2]:
+                        continue
                     temp = {}
-                    temp["pname"] = row[3]
+                    temp["pname"] = self.project_na[row[3]]
                     temp["grade"] = row[2]
                     pno = row[4]
                     unit = row[1]
                     record = row[0]
-                    record = self.show_record(pno, record, unit)
+                    if record:
+                        record = self.show_record(pno, record, unit)
+                    else:
+                        record = "无"
                     temp["record"] = record
                     pro_list.append(temp)
                 data = stu_data(sno, sname, term, cname, grade, pro_list)
@@ -252,6 +322,12 @@ class index_view(views.View):
                                         self.db.commit()
                                     except:
                                         self.db.rollback()
+                                    for k, v in self.project_un.items():
+                                        try:
+                                            self.cursor.execute("insert into sp (Sno, Pno, Pro_Unit) values('" + sno + "', '" + k + "', '" + v + "');")
+                                            self.db.commit()
+                                        except:
+                                            self.db.rollback()
                                     return redirect("/?action=sm")
                                 else:
                                     return redirect("/?action=sm&err=2")
@@ -267,6 +343,11 @@ class index_view(views.View):
                                     sno1 = self.cursor.fetchone()
                                     if not sno1:
                                         return redirect("/?action=sm&err=5")
+                                    try:
+                                        self.cursor.execute("delete from sp where Sno = '" + sno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
                                     try:
                                         self.cursor.execute("delete from student where sno = '" + sno + "'")
                                         self.db.commit()
@@ -642,7 +723,152 @@ class index_view(views.View):
                 else:
                     return redirect("/?action=sm")
             elif role == 'teacher':
-                return render_template("Teacher.html")
+                tno = session.get('user')
+                if request.method == "GET":
+                        self.cursor.execute("select Sno, Sname, Sgender, Term from student join teacher on student.Sclass = teacher.Tclass and Tno = '" + tno + "'")
+                        rows = self.cursor.fetchall()
+                        m_list = []
+                        row_num = 0
+                        for row in rows:
+                            temp = {}
+                            temp["sno"] = row[0]
+                            temp["name"] = row[1]
+                            temp["gender"] = row[2]
+                            temp["term"] = row[3]
+                            self.cursor.execute("select Pro_Record, Pro_Score from sp where Sno = '" + temp['sno'] + "' order by Pno")
+                            rows1 = self.cursor.fetchall()
+                            if rows1[0][0]:
+                                temp["50m_r"] = rows1[0][0]
+                            else:
+                                temp["50m_r"] = ""
+                            if rows1[0][1]:
+                                temp["50m_s"] = rows1[0][1]
+                            else:
+                                temp["50m_s"] = "无"
+                            if rows1[1][0]:
+                                temp["push_r"] = rows1[1][0]
+                            else:
+                                temp["push_r"] = ""
+                            if rows1[1][1]:
+                                temp["push_s"] = rows1[1][1]
+                            else:
+                                temp["push_s"] = "无"
+                            if rows1[2][0]:
+                                temp["jump_r"] = rows1[2][0]
+                            else:
+                                temp["jump_r"] = ""
+                            if rows1[2][1]:
+                                temp["jump_s"] = rows1[2][1]
+                            else:
+                                temp["jump_s"] = "无"
+                            if rows1[3][0]:
+                                temp["rise_r"] = rows1[3][0]
+                            else:
+                                temp["rise_r"] = ""
+                            if rows1[3][1]:
+                                temp["rise_s"] = rows1[3][1]
+                            else:
+                                temp["rise_s"] = "无"
+                            if rows1[4][0]:
+                                temp["up_r"] = rows1[4][0]
+                            else:
+                                temp["up_r"] = ""
+                            if rows1[4][1]:
+                                temp["up_s"] = rows1[4][1]
+                            else:
+                                temp["up_s"] = "无"
+                            if rows1[5][0]:
+                                temp["1000/800m_r"] = rows1[5][0].replace('.', '\'')
+                            else:
+                                temp["1000/800m_r"] = ""
+                            if rows1[5][1]:
+                                temp["1000/800m_s"] = rows1[5][1]
+                            else:
+                                temp["1000/800m_s"] = "无"
+                            if rows1[6][0]:
+                                temp["rope_r"] = rows1[6][0]
+                            else:
+                                temp["rope_r"] = ""
+                            if rows1[6][1]:
+                                temp["rope_s"] = rows1[6][1]
+                            else:
+                                temp["rope_s"] = "无"
+                            if rows1[7][0]:
+                                temp["2400/2000m_r"] = rows1[7][0].replace('.', '\'')
+                            else:
+                                temp["2400/2000m_r"] = ""
+                            if rows1[7][1]:
+                                temp["2400/2000m_s"] = rows1[7][1]
+                            else:
+                                temp["2400/2000m_s"] = "无"
+                            if rows1[8][1]:
+                                temp["app"] = rows1[8][1]
+                            else:
+                                temp["app"] = ""
+                            if rows1[9][1]:
+                                temp["write"] = rows1[9][1]
+                            else:
+                                temp["write"] = ""
+                            if rows1[10][1]:
+                                temp["sign"] = rows1[10][1]
+                            else:
+                                temp["sign"] = ""
+                            if rows1[11][1]:
+                                temp["special"] = rows1[11][1]
+                            else:
+                                temp["special"] = ""
+                            self.cursor.execute("select Sgrade from student where Sno = '" + temp['sno'] + "'")
+                            rows1 = self.cursor.fetchone()
+                            if rows1[0]:
+                                temp["total"] = rows1[0]
+                            else:
+                                temp["total"] = "无"
+                            temp["rn"] = row_num
+                            row_num += 1
+                            m_list.append(temp)
+                        data = m_data(m_list)
+                        err = request.args.get("err")
+                        if err:
+                            return render_template("Teacher.html", data = data, msg = self.make_msg(err))
+                        else:
+                            return render_template("Teacher.html", data = data)
+                else:
+                    self.cursor.execute("select count(*) from student join teacher on student.Sclass = teacher.Tclass and Tno = '" + tno + "'")
+                    row_sum = self.cursor.fetchone()[0]
+                    for i in range(row_sum):
+                        if request.form.get(str(i) + '-sno'):
+                            sno = request.form.get(str(i) + '-sno')
+                            if not self.input_valid(sno):
+                                return redirect("/?err=2")
+                            self.cursor.execute("select Sno from student where Sno = '" + sno + "'")
+                            sno1 = self.cursor.fetchone()
+                            if not sno1:
+                                return redirect("/?err=2")
+                            self.cursor.execute("select Sgender from student where Sno = '" + sno + "'")
+                            gender = self.cursor.fetchone()[0]
+                            for k, v in self.project_no.items():
+                                if request.form.get(str(i) + '-' + k):
+                                    record = request.form.get(str(i) + '-' + k)
+                                    record = record.replace('\'', '.')
+                                    print (record)
+                                    try:
+                                        float(record)
+                                    except:
+                                        return redirect("/?err=2")
+                                    if v == '009' or v == '010' or v == '011' or v == '012':
+                                        try:
+                                            self.cursor.execute("update sp set Pro_Score = '" + record + "' where Sno = '" + sno + "' and Pno = '" + v + "'")
+                                            self.db.commit()
+                                        except:
+                                            self.db.rollback()
+                                    else:
+                                        score = self.super_cal(v, record, gender)
+                                        try:
+                                            self.cursor.execute("update sp set Pro_Record = '" + record + "', Pro_Score = '" + score + "' where Sno = '" + sno + "' and Pno = '" + v + "'")
+                                            self.db.commit()
+                                        except:
+                                            self.db.rollback()
+                    return redirect("/")
         else:
             return redirect("/login")
 
