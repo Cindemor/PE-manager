@@ -198,3 +198,9 @@
 #form{
     height:100%;
 }
+.introductiontext {
+    text-indent: 2em;
+    font-size: 20px;
+    font-family: STKaiti;
+    text-align:justify;
+}

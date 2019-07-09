@@ -72,13 +72,11 @@
 .operationintroduction {
     width: 100%;
     height: 80%;
-    background-color: aqua;
 }
 
 #operationintroduction {
     width: 100%;
     height: 80%;
-    background-color: aqua;
 }
 
 .operation {
@@ -216,4 +214,10 @@
 
 #form {
     height: 100%;
+}
+.introductiontext {
+    text-indent: 2em;
+    font-size: 20px;
+    font-family: STKaiti;
+    text-align:justify;
 }

@@ -1,6 +1,7 @@
-from flask import render_template, Flask, views, request, redirect, session, send_from_directory
+from flask import render_template, Flask, views, request, redirect, session, send_from_directory, make_response, send_file
 from DBUtils.PooledDB import PooledDB
 import pymysql
+import tablib
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -846,28 +847,58 @@ class index_view(views.View):
                                 return redirect("/?err=2")
                             self.cursor.execute("select Sgender from student where Sno = '" + sno + "'")
                             gender = self.cursor.fetchone()[0]
+                            self.cursor.execute("select Term from student where Sno = '" + sno + "'")
+                            term = self.cursor.fetchone()[0]
+                            exi_num = 0
                             for k, v in self.project_no.items():
                                 if request.form.get(str(i) + '-' + k):
                                     record = request.form.get(str(i) + '-' + k)
                                     record = record.replace('\'', '.')
-                                    print (record)
                                     try:
                                         float(record)
                                     except:
                                         return redirect("/?err=2")
-                                    if v == '009' or v == '010' or v == '011' or v == '012':
+                                    if v == '009' or v == '010' or v == '011' or term != '大一上' and v == '012':
                                         try:
                                             self.cursor.execute("update sp set Pro_Score = '" + record + "' where Sno = '" + sno + "' and Pno = '" + v + "'")
                                             self.db.commit()
+                                            exi_num += 1
                                         except:
                                             self.db.rollback()
-                                    else:
+                                    elif ((gender == '男' and v != '005') or (gender == '女' and v != '004')) and (term == '大一上' and v != '012' or term != '大一上'):
                                         score = self.super_cal(v, record, gender)
                                         try:
                                             self.cursor.execute("update sp set Pro_Record = '" + record + "', Pro_Score = '" + score + "' where Sno = '" + sno + "' and Pno = '" + v + "'")
                                             self.db.commit()
+                                            exi_num += 1
+                                            if term != '大一上' and v != '007' and v != '008':
+                                                exi_num -= 1
                                         except:
                                             self.db.rollback()
+                            if exi_num == 6 and term != '大一上' or exi_num == 10 and term == '大一上':
+                                if term == '大一上':
+                                    self.cursor.execute("select sum(Pro_Score * 0.1) from sp where Sno = '" + sno + "' and Pro_Score != 'NULL'")
+                                    total = self.cursor.fetchone()[0]
+                                    total = '%(p).1f' % {'p': total}
+                                    try:
+                                        self.cursor.execute("update student set Sgrade = '" + total + "' where Sno = '" + sno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
+                                else:
+                                    self.cursor.execute("select sum(Pro_Score * 0.1) from sp where Sno = '" + sno + "' and (Pno = '007' or Pno = '009' or Pno = '010' or Pno = '011')")
+                                    part1 = self.cursor.fetchone()[0]
+                                    self.cursor.execute("select (Pro_Score * 0.2) from sp where Sno = '" + sno + "' and Pno = '008'")
+                                    part2 = self.cursor.fetchone()[0]
+                                    self.cursor.execute("select (Pro_Score * 0.4) from sp where Sno = '" + sno + "' and Pno = '012'")
+                                    part3 = self.cursor.fetchone()[0]
+                                    total = part1 + part2 + part3
+                                    total = '%(p).1f' % {'p': total}
+                                    try:
+                                        self.cursor.execute("update student set Sgrade = '" + total + "' where Sno = '" + sno + "'")
+                                        self.db.commit()
+                                    except:
+                                        self.db.rollback()
                     return redirect("/")
         else:
             return redirect("/login")
@@ -879,22 +910,44 @@ class index_view(views.View):
 
 
 class logout_view(views.View):
+    def dispatch_request(self):
+        session.clear()
+        return redirect('/login')
+
+
+class output_view(views.View):
     def __init__(self):
         self.db = POOL.connection()
         self.cursor = self.db.cursor()
 
     def dispatch_request(self):
-        session.clear()
-        return redirect('/login')
+        if not session.get('user'):
+            return redirect("/login")
+        username = session.get('user')
+        self.cursor.execute("select role from user where username = '" + username + "'")
+        login_role = self.cursor.fetchone()
+        if not login_role:
+            return redirect("/login")
+        role = login_role[0]
+        if role != 'teacher':
+            return redirect("/login")
+        # tno = username
+        # headers = (u"学号", u"姓名", u"性别", u"学期", u"50米", u"50米得分", u"体前屈", u"体前屈得分", u"立定跳远", u"立定跳远得分", u"引体向上", u"引体向上得分", u"仰卧起坐", u"仰卧起坐得分", u"1000米", u"1000米得分", u"800米", u"800米得分", u"跳绳", u"跳绳得分", u"2400米", u"2400米得分", u"2000米", u"2000米得分", u"运动世界校园得分", u"理论得分", u"考勤得分", u"专项得分", u"总评")
+        # data = tablib.Dataset(headers=headers)
+        # open('grade.xlsx', 'wb').write(data.xlsx)
+        # response = make_response(send_file("grade.xlsx"))
+        # response.headers["Content-Disposition"] = "attachment; filename=grade.xlsx;"
+        # return response
+        return "fuck"
 
     def __del__(self):
         self.cursor.close()
         self.db.close()
 
-
 app.add_url_rule('/', view_func=index_view.as_view('index'), methods=["GET", "POST"])
 app.add_url_rule('/login', view_func=login_view.as_view('login'), methods=["GET", "POST"])
 app.add_url_rule('/logout', view_func=logout_view.as_view('logout'), methods=["GET"])
+app.add_url_rule('/output', view_func=output_view.as_view('output'), methods=["GET"])
 
 if __name__ == '__main__':
     app.run(debug = True, port = '80')
