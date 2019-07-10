@@ -2,8 +2,10 @@ from flask import render_template, Flask, views, request, redirect, session, sen
 from DBUtils.PooledDB import PooledDB
 import pymysql
 import tablib
+from datetime import timedelta
 
 app = Flask(__name__)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = timedelta(seconds = 0)
 app.secret_key = "secret_key"
 
 POOL = PooledDB(
@@ -931,14 +933,117 @@ class output_view(views.View):
         role = login_role[0]
         if role != 'teacher':
             return redirect("/login")
-        # tno = username
-        # headers = (u"学号", u"姓名", u"性别", u"学期", u"50米", u"50米得分", u"体前屈", u"体前屈得分", u"立定跳远", u"立定跳远得分", u"引体向上", u"引体向上得分", u"仰卧起坐", u"仰卧起坐得分", u"1000米", u"1000米得分", u"800米", u"800米得分", u"跳绳", u"跳绳得分", u"2400米", u"2400米得分", u"2000米", u"2000米得分", u"运动世界校园得分", u"理论得分", u"考勤得分", u"专项得分", u"总评")
-        # data = tablib.Dataset(headers=headers)
-        # open('grade.xlsx', 'wb').write(data.xlsx)
-        # response = make_response(send_file("grade.xlsx"))
-        # response.headers["Content-Disposition"] = "attachment; filename=grade.xlsx;"
-        # return response
-        return "fuck"
+        tno = username
+        headers = (u"学号", u"姓名", u"性别", u"学期", u"50米", u"50米得分", u"体前屈", u"体前屈得分", u"立定跳远", u"立定跳远得分", u"引体向上", u"引体向上得分", u"仰卧起坐", u"仰卧起坐得分", u"1000米", u"1000米得分", u"800米", u"800米得分", u"跳绳", u"跳绳得分", u"2400米", u"2400米得分", u"2000米", u"2000米得分", u"运动世界校园得分", u"理论得分", u"考勤得分", u"专项得分", u"总评")
+        data = tablib.Dataset(headers = headers)
+        self.cursor.execute("select Sno, Sname, Sgender, Term from student join teacher on student.Sclass = teacher.Tclass and Tno = '" + tno + "'")
+        rows = self.cursor.fetchall()
+        row_num = 0
+        for row in rows:
+            temp = {}
+            temp["sno"] = row[0]
+            temp["name"] = row[1]
+            temp["gender"] = row[2]
+            temp["term"] = row[3]
+            self.cursor.execute("select Pro_Record, Pro_Score from sp where Sno = '" + temp['sno'] + "' order by Pno")
+            rows1 = self.cursor.fetchall()
+            if rows1[0][0]:
+                temp["50m_r"] = rows1[0][0]
+            else:
+                temp["50m_r"] = ""
+            if rows1[0][1]:
+                temp["50m_s"] = rows1[0][1]
+            else:
+                temp["50m_s"] = ""
+            if rows1[1][0]:
+                temp["push_r"] = rows1[1][0]
+            else:
+                temp["push_r"] = ""
+            if rows1[1][1]:
+                temp["push_s"] = rows1[1][1]
+            else:
+                temp["push_s"] = ""
+            if rows1[2][0]:
+                temp["jump_r"] = rows1[2][0]
+            else:
+                temp["jump_r"] = ""
+            if rows1[2][1]:
+                temp["jump_s"] = rows1[2][1]
+            else:
+                temp["jump_s"] = ""
+            if rows1[3][0]:
+                temp["rise_r"] = rows1[3][0]
+            else:
+                temp["rise_r"] = ""
+            if rows1[3][1]:
+                temp["rise_s"] = rows1[3][1]
+            else:
+                temp["rise_s"] = ""
+            if rows1[4][0]:
+                temp["up_r"] = rows1[4][0]
+            else:
+                temp["up_r"] = ""
+            if rows1[4][1]:
+                temp["up_s"] = rows1[4][1]
+            else:
+                temp["up_s"] = ""
+            if rows1[5][0]:
+                temp["1000/800m_r"] = rows1[5][0].replace('.', '\'')
+            else:
+                temp["1000/800m_r"] = ""
+            if rows1[5][1]:
+                temp["1000/800m_s"] = rows1[5][1]
+            else:
+                temp["1000/800m_s"] = ""
+            if rows1[6][0]:
+                temp["rope_r"] = rows1[6][0]
+            else:
+                temp["rope_r"] = ""
+            if rows1[6][1]:
+                temp["rope_s"] = rows1[6][1]
+            else:
+                temp["rope_s"] = ""
+            if rows1[7][0]:
+                temp["2400/2000m_r"] = rows1[7][0].replace('.', '\'')
+            else:
+                temp["2400/2000m_r"] = ""
+            if rows1[7][1]:
+                temp["2400/2000m_s"] = rows1[7][1]
+            else:
+                temp["2400/2000m_s"] = ""
+            if rows1[8][1]:
+                temp["app"] = rows1[8][1]
+            else:
+                temp["app"] = ""
+            if rows1[9][1]:
+                temp["write"] = rows1[9][1]
+            else:
+                temp["write"] = ""
+            if rows1[10][1]:
+                temp["sign"] = rows1[10][1]
+            else:
+                temp["sign"] = ""
+            if rows1[11][1]:
+                temp["special"] = rows1[11][1]
+            else:
+                temp["special"] = ""
+            self.cursor.execute("select Sgrade from student where Sno = '" + temp['sno'] + "'")
+            rows1 = self.cursor.fetchone()
+            if rows1[0]:
+                temp["total"] = rows1[0]
+            else:
+                temp["total"] = ""
+            temp["rn"] = row_num
+            row_num += 1
+            if temp["gender"] == '男':
+                row2 = [temp["sno"], temp["name"], temp["gender"], temp["term"], temp["50m_r"], temp["50m_s"], temp["push_r"], temp["push_s"], temp["jump_r"], temp["jump_s"], temp["rise_r"], temp["rise_s"], temp["up_r"], temp["up_s"], temp["1000/800m_r"], temp["1000/800m_s"], u"", u"", temp["rope_r"], temp["rope_s"], temp["2400/2000m_r"], temp["2400/2000m_s"], u"", u"", temp["app"], temp["write"], temp["sign"], temp["special"], temp["total"]]
+            elif temp["gender"] == '女':
+                row2 = [temp["sno"], temp["name"], temp["gender"], temp["term"], temp["50m_r"], temp["50m_s"], temp["push_r"], temp["push_s"], temp["jump_r"], temp["jump_s"], temp["rise_r"], temp["rise_s"], temp["up_r"], temp["up_s"], u"", u"", temp["1000/800m_r"], temp["1000/800m_s"], temp["rope_r"], temp["rope_s"], u"", u"", temp["2400/2000m_r"], temp["2400/2000m_s"], temp["app"], temp["write"], temp["sign"], temp["special"], temp["total"]]
+            data.append(row2)
+        open('grade-' + tno + '.xlsx', 'wb').write(data.xlsx)
+        response = make_response(send_file("grade-" + tno + ".xlsx"))
+        response.headers["Content-Disposition"] = "attachment; filename=grade-" + tno + ".xlsx;"
+        return response
 
     def __del__(self):
         self.cursor.close()
