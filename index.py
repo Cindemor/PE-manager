@@ -1,5 +1,6 @@
 from flask import render_template, Flask, views, request, redirect, session, send_from_directory, make_response, send_file
 from DBUtils.PooledDB import PooledDB
+from flask_wtf.csrf import CsrfProtect
 import pymysql
 import tablib
 from datetime import timedelta
@@ -7,6 +8,7 @@ from datetime import timedelta
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = timedelta(seconds = 0)
 app.secret_key = "secret_key"
+CsrfProtect(app)
 
 POOL = PooledDB(
     creator = pymysql,
@@ -536,7 +538,7 @@ class index_view(views.View):
                                 return redirect("/?action=tm&err=12")
                         elif mode == "search":
                             #查询教师信息
-                            sql = "select Tno, Tname, Tgender, Tclass, Cname from teacher left join course on teacher.Tclass = course.cno"
+                            sql = "select Tno, Tname, Tgender, Tclass, Cname from teacher left join course on teacher.Tclass = course.cno where '1' = '1'"
                             if self.input_valid(tno) and self.input_valid(name) and self.input_valid(gender) and self.input_valid(classno):
                                 #输入合法
                                 if tno:
@@ -549,6 +551,7 @@ class index_view(views.View):
                                     sql += " and Tclass = '" + classno + "'"
                                 self.cursor.execute(sql)
                                 rows = self.cursor.fetchall()
+                                print (rows)
                                 tm_list = []
                                 for row in rows:
                                     temp = {}

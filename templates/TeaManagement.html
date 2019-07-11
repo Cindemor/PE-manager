@@ -48,6 +48,7 @@
                 <input type="hidden" id="mode" name="mode" value="">
                 <input type="submit" value="确认" id="submit"/>
                 <!--单击确认后，学生基本信息应实时更新呈现在页面表单上-->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             </form>
         </div>
         <div id="operationintroduction" class="operationintroduction">

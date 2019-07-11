@@ -51,6 +51,7 @@
                 </table>
                 <input type="hidden" id="mode" name="mode" value="">
                 <input type="submit" value="确认" id="submit"/>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             </form>
             <!--单击确认后，学生基本信息应实时更新呈现在页面表单上-->
         </div>

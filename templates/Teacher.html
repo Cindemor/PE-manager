@@ -82,6 +82,7 @@
                 <input class="calculateexport" type="submit" value="计算成绩" />
                 <a href="/output" target="_Blank"><input class="calculateexport" type="button" value="导出成绩" /></a>
             </div>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         </form>
     </div>
 </body>
